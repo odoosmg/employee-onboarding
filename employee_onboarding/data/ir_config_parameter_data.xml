@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- AD/LDAP connection: server and domain -->
+        <record id="config_param_ad_server" model="ir.config_parameter">
+            <field name="key">employee_onboarding.ad_server</field>
+            <field name="value">172.16.27.140</field>
+        </record>
+        <record id="config_param_domain" model="ir.config_parameter">
+            <field name="key">employee_onboarding.domain</field>
+            <field name="value">employee.local</field>
+        </record>
+        <!-- Admin bind user (login name or user@domain) -->
+        <record id="config_param_admin_user" model="ir.config_parameter">
+            <field name="key">employee_onboarding.admin_user</field>
+            <field name="value">administrator</field>
+        </record>
+        <!-- Admin password: set in Odoo Settings or via System Parameters (leave empty in XML) -->
+        <record id="config_param_admin_password" model="ir.config_parameter">
+            <field name="key">employee_onboarding.admin_password</field>
+            <field name="value"/>
+        </record>
+        <!-- Where to create users: full DN and/or simple OU path.
+             Option A: users_ou = full DN, e.g. OU=Employees,DC=employee,DC=local (or CN=Users,...).
+             Option B: ou_path = simple path; DN is built as OU=Last,OU=...,DC=domain. E.g. "Employees" or "Employees/NewHires". -->
+        <record id="config_param_users_ou" model="ir.config_parameter">
+            <field name="key">employee_onboarding.users_ou</field>
+            <field name="value"/>
+        </record>
+        <record id="config_param_ou_path" model="ir.config_parameter">
+            <field name="key">employee_onboarding.ou_path</field>
+            <field name="value"/>
+        </record>
+        <!-- Security: ldaps | starttls | none (plain LDAP) -->
+        <record id="config_param_ldap_secure" model="ir.config_parameter">
+            <field name="key">employee_onboarding.ldap_secure</field>
+            <field name="value">ldaps</field>
+        </record>
+        <record id="config_param_ldaps_port" model="ir.config_parameter">
+            <field name="key">employee_onboarding.ldaps_port</field>
+            <field name="value">636</field>
+        </record>
+        <record id="config_param_ldaps_validate_cert" model="ir.config_parameter">
+            <field name="key">employee_onboarding.ldaps_validate_cert</field>
+            <field name="value">false</field>
+        </record>
+        <record id="config_param_ldap_connect_timeout" model="ir.config_parameter">
+            <field name="key">employee_onboarding.ldap_connect_timeout</field>
+            <field name="value">10</field>
+        </record>
+        <!-- Comma-separated AD group names to add new users to (e.g. ABC,XYZ). Default: ABC -->
+        <record id="config_param_default_groups" model="ir.config_parameter">
+            <field name="key">employee_onboarding.default_groups</field>
+            <field name="value">ABC</field>
+        </record>
+    </data>
+</odoo>

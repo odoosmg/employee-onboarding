@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="activity_type_create_ad_user" model="mail.activity.type">
+            <field name="name">Create AD User</field>
+            <field name="code">CREATE_AD_USER</field>
+            <field name="res_model">hr.employee</field>
+            <field name="summary">Create Active Directory account</field>
+            <field name="icon">fa-user-plus</field>
+        </record>
+
+    </data>
+</odoo>
