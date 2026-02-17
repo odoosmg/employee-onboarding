@@ -24,6 +24,7 @@ Long description of module's purpose
         # 'security/ir.model.access.csv',
         'data/ir_config_parameter_data.xml',
         'data/mail_activity_type_data.xml',
+        'data/ir_cron_data.xml',
         'data/mail_template_data.xml',
 
         'views/views.xml',

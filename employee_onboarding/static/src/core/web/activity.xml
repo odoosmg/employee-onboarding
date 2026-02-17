@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="mail.Activity" t-inherit-mode="extension">
+        <xpath expr="//t[@name='tools']" position="inside">
+            <button t-if="props.activity.can_write and props.activity.state !== 'in_progress'" 
+                    class="o-mail-Activity-start btn btn-link btn-info p-0 me-3" 
+                    t-on-click="onClickStart">
+                <i class="fa fa-play"/> Start
+            </button>
+        </xpath>
+    </t>
+</templates>

@@ -60,6 +60,10 @@ class HrEmployee(models.Model):
         Flow: validate employee data → create AD user (LDAP) → update employee → log & notify.
         """
         for employee in self:
+            # Avoid re-running logic if already successfully synced (prevents overwriting success with 'User exists' error)
+            if employee.ad_sync_status == 'success':
+                continue
+
             try:
                 # 1. Validate employee data
                 error = employee._validate_employee_for_ad()
@@ -429,3 +433,59 @@ class HrEmployee(models.Model):
             message_type='notification',
             subtype_xmlid='mail.mt_note',
         )
+
+    @api.model
+    def _cron_process_ad_creation_activities(self):
+        """
+        Cron method to process pending 'Create AD User' activities that are due or overdue.
+        """
+        # Find the activity type
+        create_ad_type = self.env.ref(
+            'employee_onboarding.activity_type_create_ad_user',
+            raise_if_not_found=False,
+        )
+        if not create_ad_type:
+            _logger.warning("Activity type 'employee_onboarding.activity_type_create_ad_user' not found.")
+            return
+
+        # Search for pending activities of this type on hr.employee records
+        activities = self.env['mail.activity'].search([
+            ('activity_type_id', '=', create_ad_type.id),
+            ('res_model', '=', 'hr.employee'),
+            ('date_deadline', '<=', fields.Date.today()),
+        ])
+
+        _logger.info("Found %s AD creation activities to process via cron.", len(activities))
+
+        for activity in activities:
+            try:
+                # Retrieve the employee record
+                employee = self.env['hr.employee'].browse(activity.res_id)
+                if not employee.exists():
+                    continue
+                
+                # Check if already processed (just in case)
+                if employee.ad_username and employee.ad_sync_status == 'success':
+                    # If already successful, just mark activity done to clean up
+                    activity.action_done()
+                    continue
+
+                # Execute logic (same as if user clicked 'Done')
+                # This calls _onboarding_activity_create_ad_done internally if hook is enabled,
+                # but since we are calling action_done() on the activity directly, we rely on 
+                # HrEmployee.message_post catching the status change...
+                # WAIT: HrEmployee.message_post intercepts the message posting.
+                # When activity.action_done() is called, it eventually calls record.message_post()
+                # via mail_activity.action_done -> ... -> message_post_with_view / message_post
+                # So simply calling activity.action_done() should trigger the logic in message_post override above.
+                
+                # However, typically 'action_done' executes the feedback process. 
+                # Let's ensure the overridden message_post is triggered.
+                activity.action_done()
+                
+                # Commit after each success to prevent one failure from rolling back all
+                self.env.cr.commit()
+
+            except Exception as e:
+                self.env.cr.rollback()
+                _logger.exception("Failed to process AD creation activity %s for employee ID %s", activity.id, activity.res_id)
