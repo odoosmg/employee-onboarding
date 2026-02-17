@@ -400,6 +400,8 @@ class HrEmployee(models.Model):
                 force_send=True,
                 email_values={
                     'email_to': self.work_email,
+                    'model': False,
+                    'res_id': False,
                 },
             )
             _logger.info("AD credentials email sent to %s for employee %s", self.work_email, self.id)
